@@ -28,6 +28,16 @@
 # Error Action Preference
 $ErrorActionPreference = "Stop"
 
+# Exit Code Matrix:
+# 0 = Success (all stages completed)
+# 1 = General failure (catch-all)
+# 2 = Stage 1 (Prechecks) failed
+# 3 = Stage 2 (Rename Computer) failed
+# 4 = Stage 3 (Miradore MDM) failed
+# 5 = Stage 4 (Bitdefender GravityZone) failed
+# 6 = Stage 5 (Windows Policies) failed
+# 7 = Stage 6 (Finalize) failed
+
 # Global Variables
 # $ApiBase = 'https://ts2-enrollment-wizard-backend.onrender.com/'
 $ApiBase = 'http://localhost:5000/'
@@ -403,7 +413,7 @@ function New-ResumeTask {
         
     $action = New-ScheduledTaskAction -Execute "PowerShell.exe" -Argument "-File `"$TaskPath`""
     $trigger = New-ScheduledTaskTrigger -AtLogOn
-    Register-ScheduledTask -TaskName $TaskName -Action $action -Trigger $trigger -Description "Teams Squared Enrollment Resume Task" -Force
+    Register-ScheduledTask -TaskName $TaskName -Action $action -Trigger $trigger -Description "Teams Squared Enrollment Resume Task" -RunLevel Highest -Force
         
     Write-Host "  [OK] Resume task created successfully" -ForegroundColor Green
     return $true
@@ -965,36 +975,37 @@ try {
   
   $prechecksSuccess = Start-PrechecksStage
   if (-not $prechecksSuccess) {
-    throw "Stage 1 failed"
+    exit 2
   }
   
   $renameSuccess = Start-RenameStage
   if (-not $renameSuccess) {
-    throw "Stage 2 failed"
+    exit 3
   }
   
   $miradoreSuccess = Start-MiradoreStage
   if (-not $miradoreSuccess) {
-    throw "Stage 3 failed"
+    exit 4
   }
   
   $bitdefenderSuccess = Start-BitdefenderStage
   if (-not $bitdefenderSuccess) {
-    throw "Stage 4 failed"
+    exit 5
   }
   
   $policiesSuccess = Start-PoliciesStage
   if (-not $policiesSuccess) {
-    throw "Stage 5 failed"
+    exit 6
   }
   
   $finalizeSuccess = Start-FinalizeStage
   if (-not $finalizeSuccess) {
-    throw "Stage 6 failed"
+    exit 7
   }
   
   Write-Host ""
   Write-Host "Enrollment completed successfully!" -ForegroundColor Green
+  exit 0
 }
 catch {
   Write-Host "Enrollment failed" -ForegroundColor Red
