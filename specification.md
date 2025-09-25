@@ -231,9 +231,10 @@
 
 ### API Endpoints used:
 
-- `/enroll/log` - Logs stage events and status
-- `/enroll/error` - Reports stage failures and errors
-- `/enroll/complete` - Marks enrollment as complete
+- `/wizard/lookup` - Get device configuration by email
+- `/wizard/log` - Logs stage events and status
+- `/wizard/error` - Reports stage failures and errors
+- `/wizard/complete` - Marks enrollment as complete
 
 ### Error handling:
 
@@ -262,6 +263,7 @@
 ### Color Coding System:
 
 #### **Green Messages:**
+
 - Successful operations
 - Stage completions
 - Service verifications
@@ -269,6 +271,7 @@
 - API connectivity confirmations
 
 #### **Red Messages:**
+
 - Failed operations
 - Error conditions
 - Service startup failures
@@ -276,18 +279,21 @@
 - Invalid user input
 
 #### **Yellow Messages:**
+
 - Informational status updates
 - Progress indicators
 - Warning messages
 - Non-critical notifications
 
 #### **Cyan Messages:**
+
 - Stage headers
 - Important announcements
 - Resume notifications
 - System status updates
 
 #### **White Messages:**
+
 - General information
 - Completion summaries
 - Service lists
@@ -296,26 +302,31 @@
 ### Message Categories:
 
 #### **Stage Headers:**
+
 - Format: `"Running Stage X: [Stage Name]"`
 - Color: Cyan
 - Purpose: Clear stage identification
 
 #### **Success Messages:**
+
 - Format: `"  [OK] [Description]"`
 - Color: Green
 - Purpose: Confirm successful operations
 
 #### **Error Messages:**
+
 - Format: `"  [FAIL] [Description]"`
 - Color: Red
 - Purpose: Indicate failed operations
 
 #### **User Input Messages:**
+
 - Format: `"  [TRY AGAIN] [Description]"`
 - Color: Red
 - Purpose: Guide user input validation
 
 #### **Progress Messages:**
+
 - Format: `"  [Description]"`
 - Color: Yellow
 - Purpose: Show ongoing operations

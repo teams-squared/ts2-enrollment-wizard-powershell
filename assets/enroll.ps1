@@ -38,7 +38,7 @@ $ErrorActionPreference = "Stop"
 # 7 = Stage 6 (Finalize) failed
 
 # Global Variables
-$ApiBase = 'https://ts2-enrollment-wizard-backend.onrender.com/'
+$ApiBase = 'https://ts2-enrollment-wizard-backend.onrender.com'
 $TaskName = "TS2-Resume"
 $TaskPath = $PSCommandPath
 $RebootDelay = 10
@@ -64,14 +64,6 @@ $script:State = @{
 }
 
 # Helper Functions
-function Get-ApiUrl {
-  param (
-    [string]$Base,
-    [string]$Path
-  )
-
-  return ($Base.TrimEnd('/') + '/' + $Path.TrimStart('/'))
-}
 
 function Invoke-ApiCall {
   param(
@@ -118,7 +110,7 @@ function Send-LogEntry {
       message  = $Message
     }
         
-    Invoke-ApiCall -Endpoint "/enroll/log" -Body $body
+    Invoke-ApiCall -Endpoint "/wizard/log" -Body $body
   }
   catch {
     Write-Host "Failed to log to API: $($_.Exception.Message)" -ForegroundColor Yellow
@@ -139,7 +131,7 @@ function Send-ErrorReport {
       errorMessage = $ErrorMessage
     }
         
-    Invoke-ApiCall -Endpoint "/enroll/error" -Body $body
+    Invoke-ApiCall -Endpoint "/wizard/error" -Body $body
   }
   catch {
     $apiError = "Failed to report error to API: $($_.Exception.Message)"
@@ -267,7 +259,7 @@ function Test-InternetConnection {
   )
 
   try {
-    $healthUri = Get-ApiUrl -Base $Base -Path '/health'
+    $healthUri = "$Base/health"
     Invoke-WebRequest -Uri $healthUri -Method Head -TimeoutSec 10 -ErrorAction Stop | Out-Null
     Write-Host '  [OK] API health endpoint reachable' -ForegroundColor Green
     return $true
@@ -302,7 +294,7 @@ function Get-DeviceConfiguration {
     [string]$Email
   )
 
-  $lookupUri = Get-ApiUrl -Base $Base -Path '/enroll/lookup'
+  $lookupUri = "$Base/wizard/lookup"
   $body = @{ email = $Email } | ConvertTo-Json
 
   try {
@@ -878,7 +870,7 @@ function Complete-Enrollment {
       "Content-Type" = "application/json"
     }
         
-    $enrollUri = "$ApiBase/enroll/complete"
+    $enrollUri = "$ApiBase/wizard/complete"
     $null = Invoke-RestMethod -Uri $enrollUri -Method POST -Headers $headers -Body ($body | ConvertTo-Json) -ErrorAction Stop
         
     Write-Host "  [OK] Enrollment marked as complete in backend" -ForegroundColor Green
