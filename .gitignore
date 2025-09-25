@@ -2,6 +2,8 @@
 dist/
 *.exe
 *.msi
+*.cat
+*.ppkg
 
 # Assets (excluded due to size and licensing)
 src/assets/*.exe
