@@ -1,106 +1,93 @@
-# TS2 Enrollment Wizard PowerShell
+# Teams Squared Device Enrollment Package
 
-PowerShell-based CLI tool for Teams Squared's device enrollment system.
+Welcome to the Teams Squared Device Enrollment system! This package contains everything needed to enroll your Windows device into our secure corporate environment.
 
-## Features
+## What This Does
 
-- **Automated Enrollment**: Complete device enrollment in 6 stages
-- **State Persistence**: Survives reboots with automatic resume
-- **Dual Logging**: Local logs and backend API reporting
-- **Security Policies**: Windows registry and network policy enforcement
-- **MDM Integration**: Miradore and Bitdefender agent installation
-- **Error Recovery**: Graceful error handling with detailed reporting
+This enrollment process will automatically:
+
+- **Configure your device** with the correct name and security settings
+- **Install security software** (Bitdefender and Miradore MDM)
+- **Apply security policies** to protect your device and data
+- **Complete in 6 stages** with automatic progress tracking
 
 ## Quick Start
 
-```powershell
-# Run as Administrator
-.\enroll.ps1
+1. **Extract all files** from this package to a single folder on your desktop
+2. **Right-click** on `enroll.ps1`
+3. **Select "Run with PowerShell"** (as Administrator)
+4. **Follow the prompts** - you'll need your Teams Squared email address
 
-# Or via installer
-TS2-Enrollment-Setup.exe
-```
+## What You'll Need
 
-## Installation
+- **Administrator access** to your Windows computer
+- **Your Teams Squared email address** (e.g., john@teamsquared.io)
+- **Internet connection** for the enrollment process
+- **About 10-15 minutes** to complete the process
 
-The wizard is distributed as a Windows installer (`TS2-Enrollment-Setup.exe`) that:
-- Installs to `C:\ProgramData\TS2\Wizard\`
-- Creates Start Menu shortcuts
-- Sets up required directory structure
-- Includes all necessary assets and scripts
+## What Happens During Enrollment
 
-## Enrollment Stages
+The process runs in 6 stages:
 
-1. **Prechecks** - Environment validation and API lookup
-2. **Rename** - Computer rename and reboot scheduling
-3. **Miradore** - MDM client installation
-4. **Bitdefender** - Security agent installation
-5. **Policies** - Windows security policy application
-6. **Finalize** - Completion reporting and cleanup
+1. **Prechecks** - Validates your email and gets device configuration
+2. **Rename Computer** - Sets your device name (may require a reboot)
+3. **Miradore MDM** - Installs mobile device management software
+4. **Bitdefender** - Installs security software
+5. **Security Policies** - Applies Windows security settings
+6. **Finalize** - Completes enrollment and shows summary
 
-## Configuration
+## Important Notes
 
-Requires `config.json` with device-specific JWT token:
+- **Keep all files together** - The script needs all files in the same folder
+- **Don't delete anything** - All files are required for the enrollment process
+- **Reboot may be required** - Your computer may restart during the process
+- **Stay logged in** - The process will resume automatically after any reboot
 
-```json
-{
-  "apiBase": "http://localhost:5000",
-  "enrollmentDeviceId": "ckz123...",
-  "jwt": "<24h single-use token>",
-  "expiresAt": "2025-09-04T12:00:00.000Z"
-}
-```
+## Troubleshooting
 
-## File Structure
+### If the script won't run:
 
-```
-C:\ProgramData\TS2\Wizard\
-  enroll.ps1             # Main orchestrator
-  scripts\               # Stage implementations
-  config\config.json     # Device configuration
-  state\state.json       # Progress tracking
-  assets\                # Installer files
-    mdm.msi             # Miradore installer
-    epskit_x64.exe      # Bitdefender installer
-    installer.xml       # Bitdefender configuration
-```
+- Make sure you're running as Administrator
+- Check that all files are in the same folder
+- Ensure you have internet connectivity
 
-## Security Policies
+### If enrollment fails:
 
-Applied based on policy IDs from backend:
-- **50/51**: USB storage controls
-- **52**: MTP/WPD blocking
-- **60/61**: Session security
-- **70**: Windows Firewall
-- **80**: Windows Update settings
+- Note the error message and stage number
+- Contact: **cybersecurity@teamsquared.io**
+- Include your device name and the error details
 
-## Requirements
+### Common Issues:
 
-- Windows 10/11
-- PowerShell 5.1+ or PowerShell 7
-- Administrator privileges
-- Internet connectivity
-- Local user account (not Microsoft/Azure AD)
+- **"Execution Policy" error**: Run PowerShell as Administrator and type: `Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope CurrentUser`
+- **"File not found" error**: Make sure all files are extracted to the same folder
+- **"Access denied" error**: Run PowerShell as Administrator
 
-## Build Process
+## What Gets Installed
 
-```powershell
-# Compile installer (requires Inno Setup)
-iscc installer.iss
+- **Miradore MDM**: Mobile device management for corporate security
+- **Bitdefender GravityZone**: Enterprise antivirus and security
+- **Windows Security Policies**: USB controls, firewall, and other security settings
 
-# Output: dist/TS2-Enrollment-Setup.exe
-```
+## After Enrollment
 
-## Assets
+Once complete, your device will be:
 
-The `src/assets/` directory contains:
-- `mdm.msi` - Miradore MDM installer
-- `epskit_x64.exe` - Bitdefender security agent
-- `installer.xml` - Bitdefender configuration
-- `icon.ico` / `icon.png` - Application icons
+- ✅ Properly named and configured
+- ✅ Protected with enterprise security software
+- ✅ Managed by our IT team
+- ✅ Compliant with company security policies
 
-**Note**: These files are excluded from git via `.gitignore` due to size and licensing restrictions. They must be obtained separately and placed in the assets directory before building the installer.
+## Support
 
-## Stack
+If you need help:
 
-PowerShell + Inno Setup + Windows Registry + Scheduled Tasks.
+- **Email**: cybersecurity@teamsquared.io
+- **Include**: Your device name, error message, and stage number
+- **Response time**: Usually within 24 hours
+
+---
+
+**Version**: 1.0.1  
+**Last Updated**: 2025-09-25  
+**Package**: Teams Squared Device Enrollment
