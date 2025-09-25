@@ -1,11 +1,13 @@
-﻿<#
+﻿#Requires -RunAsAdministrator
+
+<#
     =====================================================================
     Teams Squared Enrollment Script
     Author: Teams Squared
     Contact: cybersecurity@teamsquared.io
     =====================================================================
     Version: 1.0.1
-    Last Updated: 2025-09-25
+    Last Updated: 26-09-2025
     =====================================================================
     NOTICE:
     - This script is proprietary and must not be copied, altered, or
@@ -45,11 +47,11 @@ $ServiceWaitTime = 20
 $ServiceTimeout = 120
 
 # Miradore MDM
-$MiradorePpkgPath = Join-Path (Split-Path $PSCommandPath) "miradore.ppkg"
+$MiradorePpkgPath = Join-Path (Split-Path $PSCommandPath) "assets\miradore.ppkg"
 $MiradoreServiceName = "miradoreclient"
 
 # Bitdefender GravityZone
-$BitdefenderExePath = Join-Path (Split-Path $PSCommandPath) "setupdownloader_[aHR0cHM6Ly9jbG91ZGFwLWVjcy5ncmF2aXR5em9uZS5iaXRkZWZlbmRlci5jb20vUGFja2FnZXMvQlNUV0lOLzAvYTVBOEdnL2luc3RhbGxlci54bWw-bGFuZz1lbi1VUw==].exe"
+$BitdefenderExePath = Join-Path (Split-Path $PSCommandPath) "assets\setupdownloader_[aHR0cHM6Ly9jbG91ZGFwLWVjcy5ncmF2aXR5em9uZS5iaXRkZWZlbmRlci5jb20vUGFja2FnZXMvQlNUV0lOLzAvYTVBOEdnL2luc3RhbGxlci54bWw-bGFuZz1lbi1VUw==].exe"
 $BitdefenderServiceName = "EPSecurityService"
 
 # Shared State

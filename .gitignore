@@ -1,54 +1,7 @@
-# Build outputs
+# Build files
 build/
+
+# Asset files
 *.exe
-*.msi
 *.cat
 *.ppkg
-
-# Assets (excluded due to size and licensing)
-src/assets/*.exe
-src/assets/*.msi
-src/assets/*.xml
-
-# Keep icon files
-!src/assets/icon.ico
-!src/assets/icon.png
-
-# Logs
-*.log
-logs/
-
-# State files (runtime data)
-state/
-config/
-
-# Windows
-Thumbs.db
-ehthumbs.db
-Desktop.ini
-$RECYCLE.BIN/
-
-# PowerShell
-*.ps1.bak
-*.psm1.bak
-
-# Inno Setup
-*.iss.bak
-
-# Editor directories and files
-.vscode/
-.idea/
-*.swp
-*.swo
-*~
-
-# OS generated files
-.DS_Store
-.DS_Store?
-._*
-.Spotlight-V100
-.Trashes
-
-# Temporary files
-*.tmp
-*.temp
