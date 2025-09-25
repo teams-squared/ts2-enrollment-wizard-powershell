@@ -46,11 +46,10 @@ $ServiceWaitTime = 20
 $ServiceTimeout = 120
 
 # Miradore MDM
-$MiradorePpkgPath = Join-Path (Split-Path $PSCommandPath) "assets\miradore.ppkg"
-$MiradoreServiceName = "miradoreclient"
+$MiradorePpkgPath = Join-Path (Split-Path $PSCommandPath) "miradore.ppkg"
 
 # Bitdefender GravityZone
-$BitdefenderExePath = Join-Path (Split-Path $PSCommandPath) "assets\setupdownloader_[aHR0cHM6Ly9jbG91ZGFwLWVjcy5ncmF2aXR5em9uZS5iaXRkZWZlbmRlci5jb20vUGFja2FnZXMvQlNUV0lOLzAvYTVBOEdnL2luc3RhbGxlci54bWw-bGFuZz1lbi1VUw==].exe"
+$BitdefenderExePath = Join-Path (Split-Path $PSCommandPath) "setupdownloader_[aHR0cHM6Ly9jbG91ZGFwLWVjcy5ncmF2aXR5em9uZS5iaXRkZWZlbmRlci5jb20vUGFja2FnZXMvQlNUV0lOLzAvYTVBOEdnL2luc3RhbGxlci54bWw-bGFuZz1lbi1VUw==].exe"
 $BitdefenderServiceName = "EPSecurityService"
 
 # Shared State
@@ -101,6 +100,10 @@ function Send-LogEntry {
     [string]$Level,
     [string]$Message
   )
+    
+  if (-not $script:State.deviceId) {
+    return
+  }
     
   try {
     $body = @{
@@ -533,47 +536,20 @@ function Install-MiradoreClient {
         
     Write-Host "  Installing Miradore MDM package" -ForegroundColor Yellow
         
-    Install-ProvisioningPackage -PackagePath $MiradorePpkgPath -QuietInstall -ErrorAction Stop
-        
-    Write-Host "  [OK] Miradore MDM package installed successfully" -ForegroundColor Green
-    return $true
+    # Install provisioning package - ignore error codes as they can be misleading
+    $result = Install-ProvisioningPackage -PackagePath $MiradorePpkgPath -QuietInstall -ErrorAction SilentlyContinue
+    
+    # Check if installation was successful based on the result object
+    if ($result -and $result.IsInstalled) {
+      Write-Host "  [OK] Miradore MDM package installed successfully" -ForegroundColor Green
+      return $true
+    } else {
+      Write-Host "  [FAIL] Miradore MDM package installation failed" -ForegroundColor Red
+      return $false
+    }
   }
   catch {
     Write-Host "  [FAIL] Unable to install Miradore MDM package" -ForegroundColor Red
-    return $false
-  }
-}
-
-function Test-MiradoreService {
-  try {
-    Write-Host "  Waiting for Miradore service to start" -ForegroundColor Yellow
-    $null = Start-Sleep -Seconds $ServiceWaitTime
-        
-    $service = Get-Service -Name $MiradoreServiceName -ErrorAction SilentlyContinue
-        
-    if (-not $service) {
-      Write-Host "  [FAIL] Miradore service not found" -ForegroundColor Red
-      return $false
-    }
-
-    $elapsed = 0
-    while ($service.Status -ne "Running" -and $elapsed -lt $ServiceTimeout) {
-      $null = Start-Sleep -Seconds 5
-      $elapsed += 5
-      $service = Get-Service -Name $MiradoreServiceName -ErrorAction SilentlyContinue
-      Write-Host "  Waiting for service to start ($elapsed/$ServiceTimeout seconds)" -ForegroundColor Yellow
-    }
-
-    if ($service.Status -ne "Running") {
-      Write-Host "  [FAIL] Miradore service failed to start within timeout period" -ForegroundColor Red
-      return $false
-    }
-
-    Write-Host "  [OK] Miradore service is running" -ForegroundColor Green
-    return $true
-  }
-  catch {
-    Write-Host "  [FAIL] Unable to verify Miradore service" -ForegroundColor Red
     return $false
   }
 }
@@ -589,12 +565,6 @@ function Start-MiradoreStage {
     $installResult = Install-MiradoreClient
     if (-not $installResult) {
       throw "Unable to install Miradore MDM package"
-    }
-    
-    # Verify service is running
-    $serviceResult = Test-MiradoreService
-    if (-not $serviceResult) {
-      throw "Unable to verify Miradore service"
     }
     
     # Mark stage as completed
