@@ -326,7 +326,6 @@ function Start-PrechecksStage {
   try {
     Write-Host 'Running Stage 1: Prechecks' -ForegroundColor Cyan
     $script:State.currentStage = 1
-    $null = Send-LogEntry -Stage 1 -Level "INFO" -Message "Starting stage 1"
 
     # Test API connectivity
     $internetResult = Test-InternetConnection -Base $ApiBase
@@ -342,6 +341,8 @@ function Start-PrechecksStage {
     $script:State.deviceId = $deviceConfig.deviceId
     $script:State.deviceName = $deviceConfig.deviceName
     $script:State.policyIdsCsv = $deviceConfig.policyIdsCsv
+
+    $null = Send-LogEntry -Stage 1 -Level "INFO" -Message "Starting stage 1"
 
     # Mark stage as completed
     if ($script:State.completedStages -notcontains 1) {
