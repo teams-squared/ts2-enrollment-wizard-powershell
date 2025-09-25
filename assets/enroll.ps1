@@ -38,8 +38,7 @@ $ErrorActionPreference = "Stop"
 # 7 = Stage 6 (Finalize) failed
 
 # Global Variables
-# $ApiBase = 'https://ts2-enrollment-wizard-backend.onrender.com/'
-$ApiBase = 'http://localhost:5000/'
+$ApiBase = 'https://ts2-enrollment-wizard-backend.onrender.com/'
 $TaskName = "TS2-Resume"
 $TaskPath = $PSCommandPath
 $RebootDelay = 10
