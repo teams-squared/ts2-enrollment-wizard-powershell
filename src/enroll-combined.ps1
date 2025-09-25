@@ -4,11 +4,9 @@
     Author: Teams Squared
     Contact: cybersecurity@teamsquared.io
     =====================================================================
-
-    Version: 1.0.0
+    Version: 1.0.1
     Last Updated: 2025-09-25
     =====================================================================
-
     NOTICE:
     - This script is proprietary and must not be copied, altered, or
       redistributed without prior written consent from Teams Squared.
@@ -21,7 +19,6 @@
     - All execution should follow Teams Squared security guidelines.
     - Any suspicious behavior, vulnerabilities, or misuse must be
       immediately reported to cybersecurity@teamsquared.io.
-
     =====================================================================
 #>
 
