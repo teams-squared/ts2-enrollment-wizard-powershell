@@ -7,7 +7,7 @@ QUICK START:
 1. Extract all files to a folder on your desktop
 2. Double-click "run-enrollment.bat" (as Administrator)
 3. Follow the prompts - you'll need your Teams Squared email address
-4. Watch the video guide: https://teamsquared.io/enrollment-video
+4. Watch the video guide: https://www.loom.com/share/c0fadba382be47c5b4eda2ddeab49375?sid=f14ba22e-f6b1-4ebe-adca-c57a40a32a84
 
 WHAT YOU NEED:
 - Administrator access to your computer
