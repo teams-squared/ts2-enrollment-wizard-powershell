@@ -6,7 +6,7 @@
     Author: Teams Squared
     Contact: cybersecurity@teamsquared.io
     =====================================================================
-    Version: 1.0.2
+    Version: 1.0.3
     Last Updated: 26-09-2025
     =====================================================================
     NOTICE:
@@ -403,8 +403,10 @@ function New-ResumeTask {
       Write-Host "  [OK] Resume task already exists" -ForegroundColor Green
       return $true
     }
-        
-    $action = New-ScheduledTaskAction -Execute "PowerShell.exe" -Argument "-File `"$TaskPath`""
+      
+    # NOTE: Split-Path twice to get the parent directory of the parent directory of the task path
+    $batchPath = Join-Path (Split-Path (Split-Path $TaskPath)) "run-enrollment.bat"
+    $action = New-ScheduledTaskAction -Execute $batchPath
     $trigger = New-ScheduledTaskTrigger -AtLogOn
     Register-ScheduledTask -TaskName $TaskName -Action $action -Trigger $trigger -Description "Teams Squared Enrollment Resume Task" -RunLevel Highest -Force
         
@@ -555,8 +557,9 @@ function Install-MiradoreClient {
         return $true
       }
       else {
-        Write-Host "  [FAIL] Miradore MDM package installation failed" -ForegroundColor Red
-        return $false
+        # NOTE: Install-ProvisioningPackage does not return a reliable isInstalled flag the first time it is run.
+        Write-Host "  [WARN] Miradore MDM package may have installed without a success flag. Continuing enrollment" -ForegroundColor Yellow
+        return $true
       }
     }
     finally {
@@ -882,18 +885,15 @@ function Complete-Enrollment {
     $body = @{
       deviceId = $script:State.deviceId
     }
-    $headers = @{
-      "Content-Type" = "application/json"
-    }
         
-    $enrollUri = "$ApiBase/wizard/complete"
-    $null = Invoke-RestMethod -Uri $enrollUri -Method POST -Headers $headers -Body ($body | ConvertTo-Json) -ErrorAction Stop
+    Write-Host "  Sending completion request for device: $($script:State.deviceId)" -ForegroundColor Yellow
+    $null = Invoke-ApiCall -Endpoint "/wizard/complete" -Method "POST" -Body $body
         
     Write-Host "  [OK] Enrollment marked as complete in backend" -ForegroundColor Green
     return $true
   }
   catch {
-    Write-Host "  [FAIL] Unable to complete enrollment in backend" -ForegroundColor Red
+    Write-Host "  [FAIL] Unable to complete enrollment in backend: $($_.Exception.Message)" -ForegroundColor Red
     return $false
   }
 }
