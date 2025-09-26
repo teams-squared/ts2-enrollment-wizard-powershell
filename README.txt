@@ -29,6 +29,7 @@ IMPORTANT NOTES:
 - Don't delete anything - all files are required
 - Your computer may restart during the process
 - The process will resume automatically after any reboot
+- You'll need to enter your email address again after any restart
 - Make sure you have a working internet connection before running the installer
 - DO NOT close or quit the wizard at any stage - this may corrupt installations and cause system issues
 
@@ -39,13 +40,34 @@ BITDEFENDER INSTALLATION:
 - The main script will wait for Bitdefender to complete before continuing
 - If you close Bitdefender early, the enrollment will fail
 
-TROUBLESHOOTING:
-- "File not found" error: Make sure all files are extracted to the same folder
-- Script won't run: Always use "run-enrollment.bat" - don't try to run files in the assets folder directly
-- If you accidentally close the script: Don't worry - double click and run again. The script will continue from where it left off
-- Bitdefender installation failed: Make sure you completed the Bitdefender installation in the separate window
-- If any failure occurs: Try rerunning the script before contacting Teams Squared support
-- WARNING: If you quit the wizard during installation, it may corrupt your system - always let it complete
+FREQUENTLY ASKED QUESTIONS:
+
+Q: I get a "File not found" error. What should I do?
+A: Make sure all files are extracted to the same folder. Don't move or delete any files.
+
+Q: The script won't run. What's wrong?
+A: Always use "run-enrollment.bat" - don't try to run files in the assets folder directly. Right-click and "Run as administrator" if needed.
+
+Q: I accidentally closed the script. Is that bad?
+A: Don't worry - double click and run again. The script will continue from where it left off.
+
+Q. Miradore MDM installation failed. What do I do?
+A. Try restarting your PC, then run the enrollment script again. The script will continue from where it left off.
+
+Q: Bitdefender installation failed. What happened?
+A: Make sure you completed the Bitdefender installation in the separate window. Don't close that window until it finishes.
+
+Q: The wizard seems stuck or frozen. What should I do?
+A: Be patient - some stages take longer than others. If it's been more than 10 minutes without progress, try rerunning the script.
+
+Q: After my PC restarted, nothing is happening. Is this normal?
+A: Yes, it may take 1-2 minutes for the wizard to restart after the PC restarts. Please be patient and don't close any windows.
+
+Q: Something went wrong. Who should I contact?
+A: Try rerunning the script first. If it still fails, contact cybersecurity@teamsquared.io with your device name, error message, and stage number.
+
+Q: Can I quit the wizard if I need to do something else?
+A: NO! If you quit the wizard during installation, it may corrupt your system. Always let it complete - it will resume automatically after any reboot.
 
 WHAT GETS INSTALLED:
 - Miradore MDM: Mobile device management for corporate security

@@ -102,6 +102,7 @@ function Send-LogEntry {
   )
     
   if (-not $script:State.deviceId) {
+    Write-Host "DEBUG: Skipping log entry - deviceId is null" -ForegroundColor Yellow
     return
   }
     
@@ -113,10 +114,12 @@ function Send-LogEntry {
       message  = $Message
     }
         
-    Invoke-ApiCall -Endpoint "/wizard/log" -Body $body
+    Write-Host "DEBUG: Sending log entry for deviceId: $($script:State.deviceId)" -ForegroundColor Cyan
+    $null = Invoke-ApiCall -Endpoint "/wizard/log" -Body $body
   }
   catch {
     Write-Host "Failed to log to API: $($_.Exception.Message)" -ForegroundColor Yellow
+    Write-Host "DEBUG: Log request body: $($body | ConvertTo-Json)" -ForegroundColor Yellow
   }
 }
 
@@ -134,7 +137,7 @@ function Send-ErrorReport {
       errorMessage = $ErrorMessage
     }
         
-    Invoke-ApiCall -Endpoint "/wizard/error" -Body $body
+    $null = Invoke-ApiCall -Endpoint "/wizard/error" -Body $body
   }
   catch {
     $apiError = "Failed to report error to API: $($_.Exception.Message)"
@@ -887,6 +890,7 @@ function Complete-Enrollment {
     }
         
     Write-Host "  Sending completion request for device: $($script:State.deviceId)" -ForegroundColor Yellow
+    Write-Host "  DEBUG: Completion request body: $($body | ConvertTo-Json)" -ForegroundColor Cyan
     $null = Invoke-ApiCall -Endpoint "/wizard/complete" -Method "POST" -Body $body
         
     Write-Host "  [OK] Enrollment marked as complete in backend" -ForegroundColor Green
@@ -894,6 +898,7 @@ function Complete-Enrollment {
   }
   catch {
     Write-Host "  [FAIL] Unable to complete enrollment in backend: $($_.Exception.Message)" -ForegroundColor Red
+    Write-Host "  DEBUG: Completion request body: $($body | ConvertTo-Json)" -ForegroundColor Yellow
     return $false
   }
 }
@@ -937,11 +942,6 @@ function Start-FinalizeStage {
       throw "Unable to complete enrollment in backend"
     }
     
-    $summaryResult = Show-CompletionSummary
-    if (-not $summaryResult) {
-      throw "Unable to show completion summary"
-    }
-    
     # Mark stage as completed
     if ($script:State.completedStages -notcontains 6) {
       $script:State.completedStages += 6
@@ -949,7 +949,14 @@ function Start-FinalizeStage {
     
     Write-Host 'Stage 6 completed successfully' -ForegroundColor Green
     
+    # Log completion showing summary (device is still not assigned yet)
     $null = Send-LogEntry -Stage 6 -Level "INFO" -Message "Stage 6 completed successfully"
+    
+    $summaryResult = Show-CompletionSummary
+    if (-not $summaryResult) {
+      throw "Unable to show completion summary"
+    }
+    
     return $true
   }
   catch {
