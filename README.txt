@@ -28,6 +28,7 @@ IMPORTANT NOTES:
 - Don't delete anything - all files are required
 - Your computer may restart during the process
 - The process will resume automatically after any reboot
+- Make sure you have a working internet connection before running the installer
 
 TROUBLESHOOTING:
 - "File not found" error: Make sure all files are extracted to the same folder

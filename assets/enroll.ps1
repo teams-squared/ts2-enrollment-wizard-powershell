@@ -612,7 +612,7 @@ function Start-MiradoreStage {
 # Stage 4: Bitdefender GravityZone Functions
 function Install-BitdefenderAgent {
   try {
-    if (-not (Test-Path $BitdefenderExePath)) {
+    if (-not (Test-Path -LiteralPath $BitdefenderExePath)) {
       Write-Host "  [FAIL] Bitdefender installer not found at: $BitdefenderExePath" -ForegroundColor Red
       return $false
     }
