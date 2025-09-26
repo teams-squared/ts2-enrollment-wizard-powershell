@@ -32,8 +32,8 @@ IMPORTANT NOTES:
 
 TROUBLESHOOTING:
 - "File not found" error: Make sure all files are extracted to the same folder
-- "Access denied" error: Right-click "run-enrollment.bat" and select "Run as administrator"
 - Script won't run: Always use "run-enrollment.bat" - don't try to run files in the assets folder directly
+- If you accidentally close the script; don't worry - double click and run again. The script will continue from where it left off.
 
 WHAT GETS INSTALLED:
 - Miradore MDM: Mobile device management for corporate security
@@ -43,6 +43,7 @@ WHAT GETS INSTALLED:
 AFTER ENROLLMENT:
 Your device will be properly named, protected with enterprise security software,
 managed by our IT team, and compliant with company security policies.
+Feel free to delete the enrollment wizard package / folder once as well.
 
 SUPPORT:
 If you need help, contact: cybersecurity@teamsquared.io

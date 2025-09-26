@@ -640,18 +640,38 @@ function Install-BitdefenderAgent {
   }
 }
 
+function Test-BitdefenderInstalled {
+  try {
+    $service = Get-Service -Name $BitdefenderServiceName -ErrorAction SilentlyContinue
+    if ($service -and $service.Status -eq "Running") {
+      return $true
+    }
+    return $false
+  }
+  catch {
+    return $false
+  }
+}
+
 function Test-BitdefenderService {
   try {
     Write-Host "  Waiting for Bitdefender service to start" -ForegroundColor Yellow
     $null = Start-Sleep -Seconds $ServiceWaitTime
-        
+    
+    # Check if service exists first
     $service = Get-Service -Name $BitdefenderServiceName -ErrorAction SilentlyContinue
-        
     if (-not $service) {
       Write-Host "  [FAIL] Bitdefender service not found" -ForegroundColor Red
       return $false
     }
 
+    # If already running, return success immediately
+    if (Test-BitdefenderInstalled) {
+      Write-Host "  [OK] Bitdefender service is running" -ForegroundColor Green
+      return $true
+    }
+
+    # Wait for service to start
     $elapsed = 0
     while ($service.Status -ne "Running" -and $elapsed -lt $ServiceTimeout) {
       $null = Start-Sleep -Seconds 5
@@ -680,6 +700,19 @@ function Start-BitdefenderStage {
     Write-Host 'Running Stage 4: Bitdefender GravityZone' -ForegroundColor Cyan
     $script:State.currentStage = 4
     $null = Send-LogEntry -Stage 4 -Level "INFO" -Message "Starting stage 4"
+
+    # Check if Bitdefender is already installed and running
+    if (Test-BitdefenderInstalled) {
+      Write-Host "  Bitdefender service is already running" -ForegroundColor Green
+      
+      # Mark stage as completed
+      if ($script:State.completedStages -notcontains 4) {
+        $script:State.completedStages += 4
+      }
+      
+      $null = Send-LogEntry -Stage 4 -Level "INFO" -Message "Stage 4 completed successfully (already installed)"
+      return $true
+    }
 
     # Install Bitdefender agent
     $installResult = Install-BitdefenderAgent
