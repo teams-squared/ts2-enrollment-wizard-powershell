@@ -1,5 +1,13 @@
 # Teams Squared Enrollment Wizard - Consolidated Script
 
+## Current Version: 1.0.3 (Production Ready)
+
+### File Structure:
+- `enroll.ps1` - Main enrollment script
+- `teamssquared.ppkg` - Miradore MDM provisioning package
+- `teamssquared.cat` - Miradore MDM catalog file
+- `setupdownloader_[encoded].exe` - Bitdefender GravityZone installer
+
 ## Stage 1: Prechecks
 
 ### What it does:
@@ -80,7 +88,7 @@
 
 ### Data structures used:
 
-- `$MiradorePpkgPath` - Path to miradore.ppkg file (same directory as script)
+- `$MiradorePpkgPath` - Path to teamssquared.ppkg file (same directory as script)
 - `$ServiceWaitTime` - Global variable for service startup wait time (20 seconds)
 - `$ServiceTimeout` - Global variable for service startup timeout (120 seconds)
 - `$MiradoreServiceName` - Miradore service name ("miradoreclient")
@@ -98,6 +106,12 @@
 - Service not found errors
 - Service startup failures
 
+### Important fixes implemented:
+
+- **TMP Environment Variable Workaround**: Temporarily sets `$env:TMP = "C:\temp"` before running `Install-ProvisioningPackage` to handle usernames with spaces (PowerShell bug #13300)
+- **Force Flag**: Uses `-Force` flag with `Install-ProvisioningPackage` to handle already-installed packages
+- **Literal Path**: Uses `-LiteralPath` with `Test-Path` to handle special characters in Bitdefender installer filename
+
 ## Stage 4: Bitdefender GravityZone
 
 ### What it does:
@@ -109,7 +123,7 @@
 
 ### Data structures used:
 
-- `$BitdefenderExePath` - Path to Bitdefender installer (same directory as script)
+- `$BitdefenderExePath` - Path to setupdownloader_[encoded].exe installer (same directory as script)
 - `$BitdefenderServiceName` - Bitdefender service name ("EPSecurityService")
 - `$ServiceTimeout` - Global variable for service startup timeout (120 seconds)
 - `$ServiceWaitTime` - Global variable for initial service wait (20 seconds)
@@ -127,6 +141,11 @@
 - Installation process failures
 - Service not found errors
 - Service startup timeout failures
+
+### Important fixes implemented:
+
+- **TMP Environment Variable Workaround**: Temporarily sets `$env:TMP = "C:\temp"` before running Bitdefender installer to handle usernames with spaces
+- **Literal Path**: Uses `-LiteralPath` with `Test-Path` to handle special characters in installer filename
 
 ## Stage 5: Windows Policies
 
@@ -195,6 +214,11 @@
 - Backend API completion failures
 - Summary display failures
 - Network connectivity issues
+
+### Production readiness:
+
+- **Debug Statements Removed**: All DEBUG output statements have been removed for production use
+- **Clean Error Messages**: Only essential error messages remain for troubleshooting
 
 ### Completion summary includes:
 
