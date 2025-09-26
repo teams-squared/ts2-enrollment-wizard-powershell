@@ -102,7 +102,6 @@ function Send-LogEntry {
   )
     
   if (-not $script:State.deviceId) {
-    Write-Host "DEBUG: Skipping log entry - deviceId is null" -ForegroundColor Yellow
     return
   }
     
@@ -114,12 +113,10 @@ function Send-LogEntry {
       message  = $Message
     }
         
-    Write-Host "DEBUG: Sending log entry for deviceId: $($script:State.deviceId)" -ForegroundColor Cyan
     $null = Invoke-ApiCall -Endpoint "/wizard/log" -Body $body
   }
   catch {
     Write-Host "Failed to log to API: $($_.Exception.Message)" -ForegroundColor Yellow
-    Write-Host "DEBUG: Log request body: $($body | ConvertTo-Json)" -ForegroundColor Yellow
   }
 }
 
@@ -890,7 +887,6 @@ function Complete-Enrollment {
     }
         
     Write-Host "  Sending completion request for device: $($script:State.deviceId)" -ForegroundColor Yellow
-    Write-Host "  DEBUG: Completion request body: $($body | ConvertTo-Json)" -ForegroundColor Cyan
     $null = Invoke-ApiCall -Endpoint "/wizard/complete" -Method "POST" -Body $body
         
     Write-Host "  [OK] Enrollment marked as complete in backend" -ForegroundColor Green
@@ -898,7 +894,6 @@ function Complete-Enrollment {
   }
   catch {
     Write-Host "  [FAIL] Unable to complete enrollment in backend: $($_.Exception.Message)" -ForegroundColor Red
-    Write-Host "  DEBUG: Completion request body: $($body | ConvertTo-Json)" -ForegroundColor Yellow
     return $false
   }
 }
