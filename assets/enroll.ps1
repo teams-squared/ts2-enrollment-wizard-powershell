@@ -6,7 +6,7 @@
     Author: Teams Squared
     Contact: cybersecurity@teamsquared.io
     =====================================================================
-    Version: 1.0.1
+    Version: 1.0.2
     Last Updated: 26-09-2025
     =====================================================================
     NOTICE:
@@ -46,7 +46,7 @@ $ServiceWaitTime = 20
 $ServiceTimeout = 120
 
 # Miradore MDM
-$MiradorePpkgPath = Join-Path (Split-Path $PSCommandPath) "miradore.ppkg"
+$MiradorePpkgPath = Join-Path (Split-Path $PSCommandPath) "teamssquared.ppkg"
 
 # Bitdefender GravityZone
 $BitdefenderExePath = Join-Path (Split-Path $PSCommandPath) "setupdownloader_[aHR0cHM6Ly9jbG91ZGFwLWVjcy5ncmF2aXR5em9uZS5iaXRkZWZlbmRlci5jb20vUGFja2FnZXMvQlNUV0lOLzAvYTVBOEdnL2luc3RhbGxlci54bWw-bGFuZz1lbi1VUw==].exe"
@@ -533,17 +533,17 @@ function Install-MiradoreClient {
       Write-Host "  [FAIL] Miradore package not found at: $MiradorePpkgPath" -ForegroundColor Red
       return $false
     }
-        
+    
+    # NOTE: For the following to work, Windows must be activated
     Write-Host "  Installing Miradore MDM package" -ForegroundColor Yellow
         
-    # Install provisioning package - ignore error codes as they can be misleading
     $result = Install-ProvisioningPackage -PackagePath $MiradorePpkgPath -QuietInstall -ErrorAction SilentlyContinue
     
-    # Check if installation was successful based on the result object
-    if ($result -and $result.IsInstalled) {
+    if ($result -and $result.Result -and $result.Result.Contains("Success")) {
       Write-Host "  [OK] Miradore MDM package installed successfully" -ForegroundColor Green
       return $true
-    } else {
+    }
+    else {
       Write-Host "  [FAIL] Miradore MDM package installation failed" -ForegroundColor Red
       return $false
     }
@@ -936,40 +936,41 @@ try {
   
   $prechecksSuccess = Start-PrechecksStage
   if (-not $prechecksSuccess) {
-    exit 2
+    throw "Prechecks failed"
   }
   
   $renameSuccess = Start-RenameStage
   if (-not $renameSuccess) {
-    exit 3
+    throw "Rename failed"
   }
   
   $miradoreSuccess = Start-MiradoreStage
   if (-not $miradoreSuccess) {
-    exit 4
+    throw "Miradore failed"
   }
   
   $bitdefenderSuccess = Start-BitdefenderStage
   if (-not $bitdefenderSuccess) {
-    exit 5
+    throw "Bitdefender failed"
   }
   
   $policiesSuccess = Start-PoliciesStage
   if (-not $policiesSuccess) {
-    exit 6
+    throw "Policies failed"
   }
   
   $finalizeSuccess = Start-FinalizeStage
   if (-not $finalizeSuccess) {
-    exit 7
+    throw "Finalize failed"
   }
   
-  Write-Host ""
   Write-Host "Enrollment completed successfully!" -ForegroundColor Green
+  Write-Host -NoNewLine 'Press any key to exit...'; $null = $Host.UI.RawUI.ReadKey('NoEcho,IncludeKeyDown')
   exit 0
 }
 catch {
   Write-Host "Enrollment failed" -ForegroundColor Red
   Write-Host "Please contact cybersecurity@teamsquared.io for assistance" -ForegroundColor Yellow
+  Write-Host -NoNewLine 'Press any key to exit...'; $null = $Host.UI.RawUI.ReadKey('NoEcho,IncludeKeyDown')
   exit 1
 }

@@ -47,5 +47,5 @@ SUPPORT:
 If you need help, contact: cybersecurity@teamsquared.io
 Include your device name, error message, and stage number.
 
-Version: 1.0.1
+Version: 1.0.2
 Last Updated: 26-09-2025

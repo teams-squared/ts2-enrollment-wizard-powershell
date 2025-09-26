@@ -5,3 +5,9 @@ build/
 *.exe
 *.cat
 *.ppkg
+
+# Provisioning files
+miradore_provisioning/
+
+# Logs
+logs/
