@@ -352,7 +352,6 @@ function Start-PrechecksStage {
       $script:State.completedStages += 1
     }
 
-    Write-Host ''
     Write-Host 'Stage 1 completed successfully:' -ForegroundColor Green
     Write-Host "  Device ID   : $($deviceConfig.deviceId)"
     Write-Host "  Device Name : $($deviceConfig.deviceName)"
@@ -503,7 +502,6 @@ function Start-RenameStage {
       $script:State.completedStages += 2
     }
 
-    Write-Host ''
     Write-Host 'Stage 2 completed successfully' -ForegroundColor Green
     Write-Host "  Enrollment will resume after reboot" -ForegroundColor Cyan
     
@@ -534,18 +532,36 @@ function Install-MiradoreClient {
       return $false
     }
     
-    # NOTE: For the following to work, Windows must be activated
+    # NOTE: Workaround for PowerShell issue with usernames containing spaces
+    # See: https://github.com/PowerShell/PowerShell/issues/13300
+    # Install-ProvisioningPackage fails when username has spaces in the path
     Write-Host "  Installing Miradore MDM package" -ForegroundColor Yellow
-        
-    $result = Install-ProvisioningPackage -PackagePath $MiradorePpkgPath -QuietInstall -ErrorAction SilentlyContinue
     
-    if ($result -and $result.Result -and $result.Result.Contains("Success")) {
-      Write-Host "  [OK] Miradore MDM package installed successfully" -ForegroundColor Green
-      return $true
+    # Store original TMP environment variable
+    $originalTmp = $env:TMP
+    
+    try {
+      # Set TMP to a path without spaces to work around PowerShell bug
+      $env:TMP = "C:\temp"
+      if (-not (Test-Path $env:TMP)) {
+        New-Item -Path $env:TMP -ItemType Directory -Force | Out-Null
+      }
+      
+      # Install with -Force to handle existing packages
+      $result = Install-ProvisioningPackage -PackagePath $MiradorePpkgPath -QuietInstall -Force -ErrorAction SilentlyContinue
+      
+      if ($result -and $result.IsInstalled) {
+        Write-Host "  [OK] Miradore MDM package installed successfully" -ForegroundColor Green
+        return $true
+      }
+      else {
+        Write-Host "  [FAIL] Miradore MDM package installation failed" -ForegroundColor Red
+        return $false
+      }
     }
-    else {
-      Write-Host "  [FAIL] Miradore MDM package installation failed" -ForegroundColor Red
-      return $false
+    finally {
+      # Restore original TMP environment variable
+      $env:TMP = $originalTmp
     }
   }
   catch {
@@ -572,7 +588,6 @@ function Start-MiradoreStage {
       $script:State.completedStages += 3
     }
     
-    Write-Host ''
     Write-Host 'Stage 3 completed successfully' -ForegroundColor Green
     
     $null = Send-LogEntry -Stage 3 -Level "INFO" -Message "Stage 3 completed successfully"
@@ -683,7 +698,6 @@ function Start-BitdefenderStage {
       $script:State.completedStages += 4
     }
     
-    Write-Host ''
     Write-Host 'Stage 4 completed successfully' -ForegroundColor Green
     
     $null = Send-LogEntry -Stage 4 -Level "INFO" -Message "Stage 4 completed successfully"
@@ -772,7 +786,6 @@ function Start-PoliciesStage {
     
     if ($totalCount -eq 0) {
       Write-Host "  No policies to apply" -ForegroundColor Yellow
-      Write-Host ''
       Write-Host 'Stage 5 completed successfully' -ForegroundColor Green
       
       # Mark stage as completed
@@ -809,7 +822,6 @@ function Start-PoliciesStage {
       $script:State.completedStages += 5
     }
     
-    Write-Host ''
     Write-Host 'Stage 5 completed successfully' -ForegroundColor Green
     
     $null = Send-LogEntry -Stage 5 -Level "INFO" -Message "Stage 5 completed successfully"
@@ -939,36 +951,43 @@ try {
     throw "Prechecks failed"
   }
   
+  Write-Host ""
   $renameSuccess = Start-RenameStage
   if (-not $renameSuccess) {
     throw "Rename failed"
   }
   
+  Write-Host ""
   $miradoreSuccess = Start-MiradoreStage
   if (-not $miradoreSuccess) {
     throw "Miradore failed"
   }
   
+  Write-Host ""
   $bitdefenderSuccess = Start-BitdefenderStage
   if (-not $bitdefenderSuccess) {
     throw "Bitdefender failed"
   }
   
+  Write-Host ""
   $policiesSuccess = Start-PoliciesStage
   if (-not $policiesSuccess) {
     throw "Policies failed"
   }
   
+  Write-Host ""
   $finalizeSuccess = Start-FinalizeStage
   if (-not $finalizeSuccess) {
     throw "Finalize failed"
   }
   
+  Write-Host ""
   Write-Host "Enrollment completed successfully!" -ForegroundColor Green
   Write-Host -NoNewLine 'Press any key to exit...'; $null = $Host.UI.RawUI.ReadKey('NoEcho,IncludeKeyDown')
   exit 0
 }
 catch {
+  Write-Host ""
   Write-Host "Enrollment failed" -ForegroundColor Red
   Write-Host "Please contact cybersecurity@teamsquared.io for assistance" -ForegroundColor Yellow
   Write-Host -NoNewLine 'Press any key to exit...'; $null = $Host.UI.RawUI.ReadKey('NoEcho,IncludeKeyDown')
