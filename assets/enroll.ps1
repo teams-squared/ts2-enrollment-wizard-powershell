@@ -403,12 +403,16 @@ function New-ResumeTask {
       Write-Host "  [OK] Resume task already exists" -ForegroundColor Green
       return $true
     }
-      
-    # NOTE: Split-Path twice to get the parent directory of the parent directory of the task path
-    $batchPath = Join-Path (Split-Path (Split-Path $TaskPath)) "run-enrollment.bat"
-    $action = New-ScheduledTaskAction -Execute $batchPath
+    
+    # Running PowerShell directly since it already runs with highest previleges
+    $scriptPath = Join-Path (Split-Path $TaskPath) "enroll.ps1"
+    $psExe = Join-Path $PSHOME "powershell.exe"
+    $arguments = "-ExecutionPolicy Bypass -File `"$scriptPath`""
+
+    $action = New-ScheduledTaskAction -Execute $psExe -Argument $arguments
     $trigger = New-ScheduledTaskTrigger -AtLogOn
-    Register-ScheduledTask -TaskName $TaskName -Action $action -Trigger $trigger -Description "Teams Squared Enrollment Resume Task" -RunLevel Highest -Force
+    $settings = New-ScheduledTaskSettingsSet -AllowStartIfOnBatteries -DontStopIfGoingOnBatteries -StartWhenAvailable
+    Register-ScheduledTask -TaskName $TaskName -Action $action -Trigger $trigger -Description "Teams Squared Enrollment Resume Task" -Settings $settings -RunLevel Highest -Force
         
     Write-Host "  [OK] Resume task created successfully" -ForegroundColor Green
     return $true

@@ -61,7 +61,7 @@ Q: The wizard seems stuck or frozen. What should I do?
 A: Be patient - some stages take longer than others. If it's been more than 10 minutes without progress, try rerunning the script.
 
 Q: After my PC restarted, nothing is happening. Is this normal?
-A: Yes, it may take 1-2 minutes for the wizard to restart after the PC restarts. Please be patient and don't close any windows.
+A: Yes, it may take 1-2 minutes for the wizard to restart after the PC restarts. Please be patient and don't close any windows. If it seems to be taking longer, re-run the .bat file. 
 
 Q: Something went wrong. Who should I contact?
 A: Try rerunning the script first. If it still fails, contact cybersecurity@teamsquared.io with your device name, error message, and stage number.
