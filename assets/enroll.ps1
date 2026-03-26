@@ -161,20 +161,6 @@ function Set-USBReadOnlyPolicy {
   }
 }
 
-function Set-USBBlockAllPolicy {
-  try {
-    $regPath = "HKLM:\SOFTWARE\Policies\Microsoft\Windows\RemovableStorageDevices"
-    $null = New-Item -Path $regPath -Force -ErrorAction SilentlyContinue
-    Set-ItemProperty -Path $regPath -Name "Deny_All" -Value 1 -Type DWord -Force
-    Write-Host "    [OK] USB storage: Block all policy applied" -ForegroundColor Green
-    return $true
-  }
-  catch {
-    Write-Host "    [FAIL] USB storage: Block all policy failed" -ForegroundColor Red
-    return $false
-  }
-}
-
 function Set-MTPWPDPolicy {
   try {
     $regPath = "HKLM:\SOFTWARE\Policies\Microsoft\Windows\PortableOperatingSystem"
@@ -190,6 +176,19 @@ function Set-MTPWPDPolicy {
   }
   catch {
     Write-Host "    [FAIL] Block MTP/WPD policy failed" -ForegroundColor Red
+    return $false
+  }
+}
+
+function Set-USBDriverBlockPolicy {
+  try {
+    Set-ItemProperty -Path "HKLM:\SYSTEM\CurrentControlSet\Services\USBSTOR" -Name "Start" -Value 4
+    Set-ItemProperty -Path "HKLM:\SYSTEM\CurrentControlSet\Services\UASPStor" -Name "Start" -Value 4
+    Write-Host "    [OK] USB driver block policy applied (USBSTOR + UASPStor disabled)" -ForegroundColor Green
+    return $true
+  }
+  catch {
+    Write-Host "    [FAIL] USB driver block policy failed" -ForegroundColor Red
     return $false
   }
 }
@@ -782,7 +781,7 @@ function Set-Policy {
     
   switch ($PolicyId) {
     50 { return Set-USBReadOnlyPolicy }
-    51 { return Set-USBBlockAllPolicy }
+    51 { return Set-USBDriverBlockPolicy }
     52 { return Set-MTPWPDPolicy }
     60 { return Set-AutoLockPolicy }
     61 { return Set-HideLastUserPolicy }
